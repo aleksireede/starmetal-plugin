@@ -4,8 +4,8 @@ StarMetal on Minecraft-plugin, joka tuo peliin uusia ominaisuuksia ja parannuksi
 
 ## Ominaisuudet
 
-- Uudet metallityypit ja työkalut
-- Parannellut kaivosmekaniikat
+- Uudet aseet ja armorit
+- Parannellut combat mekaniikat
 - Mukautetut reseptit ja esineet
 
 ## Asennus
