@@ -64,7 +64,7 @@ public class item_updater {
         //Damage
         if (damage > 1) {
             lore.addFirst(MINI_MESSAGE.deserialize(""));
-            lore.addFirst(MINI_MESSAGE.deserialize("<reset><white>Damage: <red>+" + damage));
+            lore.addFirst(MINI_MESSAGE.deserialize("<!i><white>Damage: <red>+" + damage));
         }
 
         //Health
@@ -72,7 +72,7 @@ public class item_updater {
         Integer health = meta.getPersistentDataContainer().get(health_key,PersistentDataType.INTEGER);
         if (meta.getPersistentDataContainer().has(health_key)) {
             lore.add(MINI_MESSAGE.deserialize(""));
-            lore.add(MINI_MESSAGE.deserialize("<reset><white>Health: <red>+" + health));
+            lore.add(MINI_MESSAGE.deserialize("<!i><white>Health: <red>+" + health));
         }
 
         //Enchantments
@@ -81,7 +81,7 @@ public class item_updater {
         if (!enchantmentsList.isEmpty()) {
             lore.add(MINI_MESSAGE.deserialize(""));
             enchantmentsList.forEach(enchantment ->
-                    lore.add(MINI_MESSAGE.deserialize("<reset><blue>" + enchantment))
+                    lore.add(MINI_MESSAGE.deserialize("<!i><blue>" + enchantment))
             );
         }
 

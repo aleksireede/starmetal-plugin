@@ -28,10 +28,10 @@ public class cooldowns {
             @Override
             public void run() {
                 if (remainingTime > 0) {
-                    player.sendActionBar(miniMessage.deserialize("<reset><red>"+ weapon + " Cooldown: " + String.format("%.1f", remainingTime) + "s"));
+                    player.sendActionBar(miniMessage.deserialize("<!i><red>"+ weapon + " Cooldown: " + String.format("%.1f", remainingTime) + "s"));
                     remainingTime -= 0.1;
                 } else {
-                    player.sendActionBar(miniMessage.deserialize("<reset><green>"+ weapon + " Ability Ready!"));
+                    player.sendActionBar(miniMessage.deserialize("<!i><green>"+ weapon + " Ability Ready!"));
                     cancel();
                 }
             }
@@ -69,10 +69,10 @@ public class cooldowns {
                 if (timeLeft <= 0) {
                     energy.put(playerId, MAX_energy);
                     reloading.remove(playerId);
-                    player.sendActionBar(miniMessage.deserialize("<reset><green>Energy Reload complete!"));
+                    player.sendActionBar(miniMessage.deserialize("<!i><green>Energy Reload complete!"));
                     cancel();
                 } else {
-                    player.sendActionBar(miniMessage.deserialize("<reset><red>Reloading Energy..."+String.format("%.1f", timeLeft / 1000.0) + "s"));
+                    player.sendActionBar(miniMessage.deserialize("<!i><red>Reloading Energy..."+String.format("%.1f", timeLeft / 1000.0) + "s"));
                 }
             }
         }.runTaskTimer(StarMetal.getInstance(), 0L, 2L); // 2L = 0.1 seconds in ticks

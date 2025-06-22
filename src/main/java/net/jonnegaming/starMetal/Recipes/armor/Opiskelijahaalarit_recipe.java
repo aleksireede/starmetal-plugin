@@ -54,7 +54,7 @@ public class Opiskelijahaalarit_recipe implements Listener {
                     player.setMetadata("opiskelijahaalaritEquipped", new FixedMetadataValue(plugin, true));
 
                     // Send the message only once
-                    player.sendActionBar(miniMessage.deserialize("<reset><green>"+ "You have equipped Opiskelijahaalarit with Curse of Binding!"));
+                    player.sendActionBar(miniMessage.deserialize("<!i><green>"+ "You have equipped Opiskelijahaalarit with Curse of Binding!"));
                 }
             }
         }
