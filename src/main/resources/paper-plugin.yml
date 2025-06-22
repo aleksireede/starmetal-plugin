@@ -1,0 +1,8 @@
+name: StarMetal
+version: '1.0'
+main: net.jonnegaming.starMetal.StarMetal
+api-version: '1.21'
+permissions:
+  starmetal.jonnegivecommand:
+    description: "This is a permission node"
+    default: op

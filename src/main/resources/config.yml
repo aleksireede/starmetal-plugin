@@ -1,0 +1,25 @@
+weapons:
+  rose_dagger:
+    enable: true
+    attack-damage: 15
+  shadow_dagger:
+    enable: true
+    attack-damage: 7
+  lightsaber:
+    enable: true
+    attack-damage: 20
+  anime_staff:
+    enable: true
+    attack-damage: 30
+  doom_sword:
+    enable: true
+    attack-damage: 20
+  giant_sword:
+    enable: true
+    attack-damage: 35
+  anime_fan:
+    enable: true
+    attack-damage: 10
+  black_clover:
+    enable: true
+    attack-damage: 25
