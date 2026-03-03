@@ -18,15 +18,11 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 public class animestaff_recipe implements Listener {
+    private static final String COOLDOWN_KEY = "anime_staff";
+    private static final long COOLDOWN_TIME = 2500;
     private static final long RELOAD_TIME = 5000;
-    private static final long SHOT_DELAY = 25;
     private final StarMetal plugin;
-    private final Map<UUID, Long> lastShotTime = new HashMap<>();
 
     public animestaff_recipe(StarMetal plugin) {
         this.plugin = plugin;
@@ -51,7 +47,6 @@ public class animestaff_recipe implements Listener {
     public void onRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-        UUID playerId = player.getUniqueId();
 
         // Check if correct event and hand slot and clicking air
         if (event.getHand() != EquipmentSlot.HAND) return;
@@ -59,13 +54,8 @@ public class animestaff_recipe implements Listener {
 
         // Only allow custom item
         if (ItemHelper.isCustomItem(item, 1)) {
-            long currentTime = System.currentTimeMillis();
             if (cooldowns.isReloading(player)) return;
-
-            if (lastShotTime.containsKey(playerId) && currentTime - lastShotTime.get(playerId) < SHOT_DELAY) return;
-            lastShotTime.put(playerId, currentTime);
-
-            ItemHelper.reduceDurability(player, item);
+            if (cooldowns.isOnCooldown(player, COOLDOWN_KEY, COOLDOWN_TIME)) return;
 
             // override vanilla event
             event.setCancelled(true);
@@ -73,7 +63,11 @@ public class animestaff_recipe implements Listener {
             // shooting logic
             projectile_launcher.launchCustomProjectile(player, new ItemStack(Material.SLIME_BALL), "anime_staff", Sound.ENTITY_BREEZE_WIND_BURST, true);
 
+            // custom durability reduction
+            ItemHelper.reduceDurability(player, item);
+
             cooldowns.consumeEnergy(player);
+            cooldowns.run_cooldown(player, COOLDOWN_KEY, COOLDOWN_TIME, "Anime Staff");
             if (cooldowns.getEnergy(player) <=0){
                 cooldowns.run_reload(player,RELOAD_TIME);
             }

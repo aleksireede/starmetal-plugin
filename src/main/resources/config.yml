@@ -1,3 +1,30 @@
+metadata-keys:
+  custom-id: custom_id
+  rarity: rarity
+  item-type: item_type
+  health: health
+
+ui:
+  # action_bar, title, subtitle, boss_bar, scoreboard, chat
+  status-display-mode: boss_bar
+  scoreboard-title: "<gold>StarMetal"
+
+resource-pack:
+  url: "https://www.dropbox.com/scl/fi/och0h1871e9gxs0sjitfg/starmetal_resourcepack.zip?rlkey=0165kyc9mj6wqe3r8l40tx075&st=bj1f417m&dl=1"
+  hash: "5c2689bb7dd3a9305d53edde12aea3cad24f9a3e"
+  prompt: "Tama resurssipaketti tarvitaan nayttamaan modatut esineet./This resource pack is required to show modded items."
+  required: true
+  invulnerable-ticks: 300
+  welcome-title: "Welcome"
+  welcome-subtitle: "to Jonne Gaming Server!"
+  title-fade-in-seconds: 1
+  title-stay-seconds: 3
+  title-fade-out-seconds: 1
+
+version-checker:
+  enabled: true
+  api-url: "https://api.github.com/repos/aleksireede/starmetal-plugin/releases/latest"
+
 weapons:
   rose_dagger:
     enable: true
@@ -14,6 +41,9 @@ weapons:
   doom_sword:
     enable: true
     attack-damage: 20
+  crystal_reaper:
+    enable: true
+    attack-damage: 50
   giant_sword:
     enable: true
     attack-damage: 35

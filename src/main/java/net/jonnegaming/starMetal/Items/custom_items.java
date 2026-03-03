@@ -30,6 +30,10 @@ public class custom_items {
         return item_creator.createCustomWeapon(new ItemStack(Material.NETHERITE_SWORD), "Black Clover", 8, "Ancient", "Sword");
     }
 
+    public static ItemStack crystal_reaper() {
+        return item_creator.createCustomWeapon(new ItemStack(Material.NETHERITE_SWORD), "Crystal Reaper", 9, "Abyssal", "Sword");
+    }
+
     public static ItemStack anime_staff() {
         return item_creator.createCustomWeapon(new ItemStack(Material.IRON_SWORD), "Anime Staff", 1, "Divine", "Staff");
     }

@@ -1,12 +1,13 @@
 package net.jonnegaming.starMetal.text;
 
-import net.jonnegaming.starMetal.StarMetal;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Objects;
+
+import static net.jonnegaming.starMetal.config.itemTypeKey;
+import static net.jonnegaming.starMetal.config.rarityKey;
 
 public class item_strings {
 
@@ -56,8 +57,7 @@ public class item_strings {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return "";
         // If rarity not defined default to common rarity
-        NamespacedKey rarity_key = new NamespacedKey(StarMetal.getInstance(), "rarity");
-        String rarity = meta.getPersistentDataContainer().get(rarity_key, PersistentDataType.STRING);
+        String rarity = meta.getPersistentDataContainer().get(rarityKey(), PersistentDataType.STRING);
         if (rarity == null || rarity.isEmpty()) {
             rarity = "Common";
         }
@@ -70,9 +70,8 @@ public class item_strings {
         if (meta == null)return "";
         String ItemType = "";
         //Get the item type from the container
-        NamespacedKey itemType_key = new NamespacedKey(StarMetal.getInstance(), "item_type");
-        if (meta.getPersistentDataContainer().has(itemType_key, PersistentDataType.STRING)) {
-            ItemType = Objects.requireNonNull(meta.getPersistentDataContainer().get(itemType_key, PersistentDataType.STRING)).toUpperCase();
+        if (meta.getPersistentDataContainer().has(itemTypeKey(), PersistentDataType.STRING)) {
+            ItemType = Objects.requireNonNull(meta.getPersistentDataContainer().get(itemTypeKey(), PersistentDataType.STRING)).toUpperCase();
         }
         return ItemType;
     }

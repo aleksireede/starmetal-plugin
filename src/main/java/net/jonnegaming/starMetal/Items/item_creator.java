@@ -6,7 +6,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -16,6 +19,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import static net.jonnegaming.starMetal.config.customIdKey;
+import static net.jonnegaming.starMetal.config.healthKey;
+import static net.jonnegaming.starMetal.config.itemTypeKey;
+import static net.jonnegaming.starMetal.config.rarityKey;
 import static net.jonnegaming.starMetal.Items.item_updater.updateChecker;
 import static net.jonnegaming.starMetal.text.item_strings.getColorFromRarity;
 import static net.jonnegaming.starMetal.text.item_strings.getDurabilityFromRarity;
@@ -23,10 +30,7 @@ import static net.jonnegaming.starMetal.text.strings.cleanString;
 
 public class item_creator {
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
-    private static final String CUSTOM_ID_KEY = "custom_id";
-    private static final String RARITY_KEY = "rarity";
-    private static final String ITEM_TYPE_KEY = "item_type";
-    private static final String HEALTH_KEY = "health";
+    private static final double CUSTOM_WEAPON_ATTACK_SPEED = -2.0;
 
     /**
      * Create Shapeless recipes
@@ -70,6 +74,15 @@ public class item_creator {
         ItemMeta meta = item.getItemMeta();
 
         if (meta != null) {
+            meta.addAttributeModifier(
+                    Attribute.ATTACK_SPEED,
+                    new AttributeModifier(
+                            new NamespacedKey(StarMetal.getInstance(), cleanString(itemName).toLowerCase() + "_attack_speed"),
+                            CUSTOM_WEAPON_ATTACK_SPEED,
+                            AttributeModifier.Operation.ADD_NUMBER,
+                            EquipmentSlotGroup.HAND
+                    )
+            );
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS);
             item.setItemMeta(meta);
         }
@@ -87,8 +100,7 @@ public class item_creator {
             if (customId == 4){
                 leatherMeta.addEnchant(Enchantment.BINDING_CURSE,1,false);
                 leatherMeta.addEnchant(Enchantment.PROTECTION,5,true);
-                NamespacedKey health_key = new NamespacedKey(StarMetal.getInstance(),HEALTH_KEY);
-                leatherMeta.getPersistentDataContainer().set(health_key,PersistentDataType.INTEGER,8);
+                leatherMeta.getPersistentDataContainer().set(healthKey(), PersistentDataType.INTEGER,8);
             }
             item.setItemMeta(leatherMeta);
         }
@@ -105,16 +117,13 @@ public class item_creator {
             meta.setItemModel(metaKey);
 
             //Custom id
-            NamespacedKey customIdKey = new NamespacedKey(StarMetal.getInstance(), CUSTOM_ID_KEY);
-            meta.getPersistentDataContainer().set(customIdKey, PersistentDataType.INTEGER, customId);
+            meta.getPersistentDataContainer().set(customIdKey(), PersistentDataType.INTEGER, customId);
 
             //Rarity
-            NamespacedKey rarityKey = new NamespacedKey(StarMetal.getInstance(), RARITY_KEY);
-            meta.getPersistentDataContainer().set(rarityKey, PersistentDataType.STRING, rarity.toLowerCase());
+            meta.getPersistentDataContainer().set(rarityKey(), PersistentDataType.STRING, rarity.toLowerCase());
 
             //Item type
-            NamespacedKey itemTypeKey = new NamespacedKey(StarMetal.getInstance(), ITEM_TYPE_KEY);
-            meta.getPersistentDataContainer().set(itemTypeKey, PersistentDataType.STRING, itemType);
+            meta.getPersistentDataContainer().set(itemTypeKey(), PersistentDataType.STRING, itemType);
 
             meta.setEnchantmentGlintOverride(false);
 

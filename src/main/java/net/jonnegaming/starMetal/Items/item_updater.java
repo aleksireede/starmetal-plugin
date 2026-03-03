@@ -18,17 +18,26 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.jonnegaming.starMetal.config.customIdKey;
+import static net.jonnegaming.starMetal.config.healthKey;
 import static net.jonnegaming.starMetal.text.custom_item_lore.*;
 
 public class item_updater {
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
-    private static final String CUSTOM_ID_KEY = "custom_id";
-    private static final String HEALTH_KEY = "health";
+    private static final NamespacedKey CUSTOM_ID_NAMESPACED_KEY = customIdKey();
 
     public static void updateChecker(ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return;
+        if (item == null || !item.hasItemMeta()) {
+            return;
+        }
 
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return;
+        }
+
+        if (!meta.getPersistentDataContainer().has(CUSTOM_ID_NAMESPACED_KEY)) return;
+        // Only allow custom items to get the updated data
         updateItem(item, getLore(item), ItemHelper.getWeaponDamage(item));
     }
 
@@ -36,8 +45,7 @@ public class item_updater {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return new ArrayList<>();
 
-        NamespacedKey customIdKey = new NamespacedKey(StarMetal.getInstance(), CUSTOM_ID_KEY);
-        Integer customId = meta.getPersistentDataContainer().get(customIdKey, PersistentDataType.INTEGER);
+        Integer customId = meta.getPersistentDataContainer().get(CUSTOM_ID_NAMESPACED_KEY, PersistentDataType.INTEGER);
 
         if (customId == null) {
             return new ArrayList<>();
@@ -53,6 +61,7 @@ public class item_updater {
             case 6 -> giant_sword_lore();
             case 7 -> anime_fan_lore();
             case 8 -> black_clover_lore();
+            case 9 -> crystal_reaper_lore();
             default -> new ArrayList<>();
         };
     }
@@ -68,9 +77,8 @@ public class item_updater {
         }
 
         //Health
-        NamespacedKey health_key = new NamespacedKey(StarMetal.getInstance(),HEALTH_KEY);
-        Integer health = meta.getPersistentDataContainer().get(health_key,PersistentDataType.INTEGER);
-        if (meta.getPersistentDataContainer().has(health_key)) {
+        Integer health = meta.getPersistentDataContainer().get(healthKey(), PersistentDataType.INTEGER);
+        if (meta.getPersistentDataContainer().has(healthKey())) {
             lore.add(MINI_MESSAGE.deserialize(""));
             lore.add(MINI_MESSAGE.deserialize("<!i><white>Health: <red>+" + health));
         }

@@ -29,7 +29,7 @@ Tämä projekti on lisensoitu [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.h
 
 ### Edellytykset
 
-- Java Development Kit (JDK) 17 tai uudempi
+- Java Development Kit (JDK) 21 tai uudempi
 - Maven
 
 ### Projektin kääntäminen
@@ -38,6 +38,6 @@ Tämä projekti on lisensoitu [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.h
    git clone https://github.com/omistaja/StarMetal.git
 2. Siirry projektin juurikansioon:
    cd StarMetal
-3.Käännä projekti Mavenilla:
+3. Käännä projekti Mavenilla:
 mvn clean package
 4. Käännetty .jar-tiedosto löytyy target-kansiosta.

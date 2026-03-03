@@ -1,6 +1,5 @@
 package net.jonnegaming.starMetal.listeners;
 
-import net.jonnegaming.starMetal.StarMetal;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -19,15 +18,14 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
 
+import static net.jonnegaming.starMetal.config.customIdKey;
 import static net.jonnegaming.starMetal.ItemHelper.getDefaultDamageValue;
 import static net.jonnegaming.starMetal.ItemHelper.getWeaponDamage;
 
 public class player_damage_listener implements Listener {
-    private final StarMetal plugin;
-    private static final String CUSTOM_ID_KEY = "custom_id";
+    private final NamespacedKey custom_id = customIdKey();
 
-    public player_damage_listener(StarMetal plugin) {
-        this.plugin = plugin;
+    public player_damage_listener() {
     }
 
     // Event handler, that disables fall damage when an item is held
@@ -36,10 +34,9 @@ public class player_damage_listener implements Listener {
         if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
         if (!(event.getEntity() instanceof Player player)) return;
 
-        // get the necessary variables
+        // get item that the player is holding
         ItemStack item = player.getInventory().getItemInMainHand();
         ItemMeta meta = item.getItemMeta();
-        NamespacedKey custom_id = new NamespacedKey(plugin, "custom_id");
 
         //disable fall damage when holding a Dark heart weapon
         if (item.hasItemMeta()) {
@@ -81,6 +78,7 @@ public class player_damage_listener implements Listener {
      */
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
+        // ensure that the player is the one using the weapon to make damage
         if (event.getDamager() instanceof Player player) {
             ItemStack item = player.getInventory().getItemInMainHand();
 
@@ -159,8 +157,8 @@ public class player_damage_listener implements Listener {
 
             // Reduce the damage percentage
             damage -= damage * (armorProtection / 100);
-            if (damage < 0) {
-                damage = 0;
+            if (damage < 0.0) {
+                damage = 0.0;
             }
             event.setDamage(damage);
         }
@@ -171,16 +169,20 @@ public class player_damage_listener implements Listener {
      */
     private double calculateArmorProtection(Player player, EntityDamageEvent.DamageCause cause) {
         double protection = 0;
-        NamespacedKey customIdKey = new NamespacedKey(StarMetal.getInstance(), CUSTOM_ID_KEY);
 
         //Check every armor from player
         for (ItemStack armorPiece : player.getInventory().getArmorContents()) {
             if (armorPiece != null) {
                 ItemMeta meta = armorPiece.getItemMeta();
+                if (meta == null) {
+                    protection += getArmorProtectionValue(armorPiece.getType());
+                    continue;
+                }
 
                 // Get the base protection value of the armor piece
-                if (meta.getPersistentDataContainer().has(customIdKey) && !meta.getPersistentDataContainer().isEmpty() && meta.getPersistentDataContainer().get(customIdKey,PersistentDataType.INTEGER) != null){
-                    int custom_id = meta.getPersistentDataContainer().get(customIdKey,PersistentDataType.INTEGER);
+                Integer customId = meta.getPersistentDataContainer().get(customIdKey(), PersistentDataType.INTEGER);
+                if (customId != null){
+                    int custom_id = customId;
                     protection += getCustomArmorProtectionValue(custom_id);
                 } else {
                     protection += getArmorProtectionValue(armorPiece.getType());
@@ -227,8 +229,8 @@ public class player_damage_listener implements Listener {
         }
 
         // Cap the protection at 75% of damage
-        if (protection > 75) {
-            protection = 75;
+        if (protection > 80) {
+            protection = 80;
         }
 
         return protection;
@@ -242,8 +244,9 @@ public class player_damage_listener implements Listener {
     private double getCustomArmorProtectionValue(Integer custom_id){
         int val = 0;
         switch (custom_id){
+            // 4 is the number corresponding to opiskelijahaalarit
             case 4: val = 8;
-            case null, default: {};
+            case null, default: {}
         }
         return val;
     }
@@ -255,12 +258,13 @@ public class player_damage_listener implements Listener {
         return switch (material) {
             case NETHERITE_CHESTPLATE, DIAMOND_CHESTPLATE -> 8;
             case NETHERITE_LEGGINGS, DIAMOND_LEGGINGS, IRON_CHESTPLATE -> 6;
-            case IRON_LEGGINGS, CHAINMAIL_CHESTPLATE, GOLDEN_CHESTPLATE -> 5;
-            case CHAINMAIL_LEGGINGS -> 4;
+            case IRON_LEGGINGS, CHAINMAIL_CHESTPLATE, GOLDEN_CHESTPLATE, COPPER_CHESTPLATE -> 5;
+            case CHAINMAIL_LEGGINGS, COPPER_LEGGINGS -> 4;
             case DIAMOND_BOOTS, DIAMOND_HELMET, NETHERITE_HELMET, NETHERITE_BOOTS, GOLDEN_LEGGINGS,
                  LEATHER_CHESTPLATE -> 3;
             case LEATHER_LEGGINGS, GOLDEN_HELMET, IRON_HELMET, IRON_BOOTS, CHAINMAIL_HELMET -> 2;
-            case CHAINMAIL_BOOTS, LEATHER_HELMET, LEATHER_BOOTS, GOLDEN_BOOTS -> 1;
+            case CHAINMAIL_BOOTS, LEATHER_HELMET, LEATHER_BOOTS, GOLDEN_BOOTS, COPPER_HELMET,
+                 COPPER_BOOTS -> 1;
             default -> 0;
         };
     }

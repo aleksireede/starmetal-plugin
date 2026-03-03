@@ -16,21 +16,24 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import static net.jonnegaming.starMetal.config.customIdKey;
 import static net.jonnegaming.starMetal.ItemHelper.getWeaponDamage;
 
 public class weapon_damage implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        // Check if the damager is a player and the event is not cancelled
+        // Check if the damager is a player and the event is not canceled
         if (event.getDamager() instanceof Player player && !event.isCancelled()) {
             ItemStack item = player.getInventory().getItemInMainHand();
 
             // Ensure the damage cause is entity attack or similar to avoid thorns, etc.
             if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) {
+                if (getWeaponDamage(item) <= 0) {
+                    return;
+                }
 
                 Location location = event.getEntity().getLocation();
                 itemSoundAndPArticle(player,location);
-                event.setDamage(getWeaponDamage(item));
             }
         }
     }
@@ -78,24 +81,26 @@ public class weapon_damage implements Listener {
     private void custom_item_effects(Player player) {
         ItemStack item = player.getInventory().getItemInMainHand();
         ItemMeta meta = item.getItemMeta();
-        NamespacedKey custom_id = new NamespacedKey(StarMetal.getInstance(), "custom_id");
         if (meta == null) return;
 
         // choose the weapon
-        if (meta.getPersistentDataContainer().has(custom_id)) {
-            switch (meta.getPersistentDataContainer().get(custom_id, PersistentDataType.INTEGER)) {
-                case 0, 1, 3, 6, 2, 5 -> {}
-                case 7 -> {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 1, false, false));
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,100, 1, false, false));
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,100, 1, false, false));
-                }
-                case 8 -> {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 1, false, false));
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, 100, 1, false, false));
-                }
-                case null, default -> {
-                }
+        Integer customId = meta.getPersistentDataContainer().get(customIdKey(), PersistentDataType.INTEGER);
+        if (customId == null) {
+            return;
+        }
+
+        switch (customId) {
+            case 0, 1, 2, 3, 5, 6 -> {}
+            case 7 -> {
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 1, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE,100, 1, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,100, 1, false, false));
+            }
+            case 8 -> {
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 1, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, 100, 1, false, false));
+            }
+            default -> {
             }
         }
     }

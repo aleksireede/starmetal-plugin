@@ -15,16 +15,17 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.metadata.FixedMetadataValue;
-
-import java.util.UUID;
+import org.bukkit.persistence.PersistentDataType;
 
 public class shadow_dagger_recipe implements Listener {
+    private static final String COOLDOWN_KEY = "shadow_dagger";
     private static final long COOLDOWN_TIME = 2500; // 2.5 seconds in milliseconds
     private final StarMetal plugin;
+    private final NamespacedKey shadowDaggerProjectileKey;
 
     public shadow_dagger_recipe(StarMetal plugin) {
         this.plugin = plugin;
+        this.shadowDaggerProjectileKey = new NamespacedKey(plugin, "shadow_dagger_projectile");
         registerCraftingRecipe();
     }
 
@@ -48,13 +49,12 @@ public class shadow_dagger_recipe implements Listener {
         if ((event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK)) return;
 
         Player player = event.getPlayer();
-        UUID playerId = player.getUniqueId();
         ItemStack item = player.getInventory().getItemInMainHand();
 
         //Check for custom item
         if (ItemHelper.isCustomItem(item, 2)) {
             // Don't shoot if on cooldown
-            if (cooldowns.cooldowns_list.containsKey(playerId) && (System.currentTimeMillis() - cooldowns.cooldowns_list.get(playerId) < COOLDOWN_TIME)) {
+            if (cooldowns.isOnCooldown(player, COOLDOWN_KEY, COOLDOWN_TIME)) {
                 return;
             }
 
@@ -65,13 +65,13 @@ public class shadow_dagger_recipe implements Listener {
             shoot_pearl(player);
 
             //Cooldown logic
-            cooldowns.run_cooldown(player, COOLDOWN_TIME, "Shadow Dagger");
+            cooldowns.run_cooldown(player, COOLDOWN_KEY, COOLDOWN_TIME, "Shadow Dagger");
         }
     }
 
     private void shoot_pearl(Player player) {
         EnderPearl pearl = player.launchProjectile(EnderPearl.class);
-        pearl.setMetadata("shadow_dagger", new FixedMetadataValue(plugin, true));
+        pearl.getPersistentDataContainer().set(shadowDaggerProjectileKey, PersistentDataType.BYTE, (byte) 1);
         pearl.setShooter(player);
     }
 }

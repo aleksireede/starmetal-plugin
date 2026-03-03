@@ -1,5 +1,6 @@
 package net.jonnegaming.starMetal.energy;
 
+import net.jonnegaming.starMetal.StatusDisplay;
 import net.jonnegaming.starMetal.StarMetal;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -11,16 +12,16 @@ import java.util.Map;
 import java.util.UUID;
 
 public class cooldowns {
-    public static final Map<UUID, Long> cooldowns_list = new HashMap<>();
+    public static final Map<UUID, Map<String, Long>> cooldowns_list = new HashMap<>();
     private static final HashSet<UUID> reloading = new HashSet<>(); // Track players in reload state
     private static final Map<UUID, Integer> energy = new HashMap<>();
     private static final int MAX_energy = 5;
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     // Cooldown logic timer and display
-    public static void run_cooldown(Player player, long COOLDOWN_TIME, String weapon) {
+    public static void run_cooldown(Player player, String cooldownKey, long COOLDOWN_TIME, String weapon) {
         UUID playerId = player.getUniqueId();
-        cooldowns_list.put(playerId, System.currentTimeMillis());
+        cooldowns_list.computeIfAbsent(playerId, ignored -> new HashMap<>()).put(cooldownKey, System.currentTimeMillis());
 
         new BukkitRunnable() {
             double remainingTime = COOLDOWN_TIME / 1000.0;
@@ -28,14 +29,28 @@ public class cooldowns {
             @Override
             public void run() {
                 if (remainingTime > 0) {
-                    player.sendActionBar(miniMessage.deserialize("<!i><red>"+ weapon + " Cooldown: " + String.format("%.1f", remainingTime) + "s"));
+                    StatusDisplay.show(
+                            player,
+                            miniMessage.deserialize("<!i><red>" + weapon + " Cooldown: " + String.format("%.1f", remainingTime) + "s"),
+                            (float) (remainingTime / (COOLDOWN_TIME / 1000.0))
+                    );
                     remainingTime -= 0.1;
                 } else {
-                    player.sendActionBar(miniMessage.deserialize("<!i><green>"+ weapon + " Ability Ready!"));
+                    StatusDisplay.showTemporary(player, miniMessage.deserialize("<!i><green>" + weapon + " Ability Ready!"), 40L);
                     cancel();
                 }
             }
         }.runTaskTimer(StarMetal.getInstance(), 0, 2);
+    }
+
+    public static boolean isOnCooldown(Player player, String cooldownKey, long cooldownTime) {
+        Map<String, Long> playerCooldowns = cooldowns_list.get(player.getUniqueId());
+        if (playerCooldowns == null) {
+            return false;
+        }
+
+        Long lastUse = playerCooldowns.get(cooldownKey);
+        return lastUse != null && System.currentTimeMillis() - lastUse < cooldownTime;
     }
 
     public static Integer getEnergy(Player player){
@@ -51,7 +66,8 @@ public class cooldowns {
 
     public static void consumeEnergy(Player player){
         UUID playerId = player.getUniqueId();
-        energy.put(playerId,energy.get(playerId)-1);
+        energy.putIfAbsent(playerId, MAX_energy);
+        energy.put(playerId, energy.get(playerId) - 1);
     }
     
     public static void run_reload(Player player, long RELOAD_TIME){
@@ -69,10 +85,14 @@ public class cooldowns {
                 if (timeLeft <= 0) {
                     energy.put(playerId, MAX_energy);
                     reloading.remove(playerId);
-                    player.sendActionBar(miniMessage.deserialize("<!i><green>Energy Reload complete!"));
+                    StatusDisplay.showTemporary(player, miniMessage.deserialize("<!i><green>Energy Reload complete!"), 40L);
                     cancel();
                 } else {
-                    player.sendActionBar(miniMessage.deserialize("<!i><red>Reloading Energy..."+String.format("%.1f", timeLeft / 1000.0) + "s"));
+                    StatusDisplay.show(
+                            player,
+                            miniMessage.deserialize("<!i><red>Reloading Energy..." + String.format("%.1f", timeLeft / 1000.0) + "s"),
+                            (float) timeLeft / RELOAD_TIME
+                    );
                 }
             }
         }.runTaskTimer(StarMetal.getInstance(), 0L, 2L); // 2L = 0.1 seconds in ticks

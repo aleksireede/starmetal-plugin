@@ -8,6 +8,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import static net.jonnegaming.starMetal.config.config;
+import static net.jonnegaming.starMetal.config.customIdKey;
 
 import java.util.Objects;
 
@@ -24,13 +25,12 @@ public class ItemHelper {
 
         // get custom id
         ItemMeta meta = item.getItemMeta();
-        NamespacedKey customIdKey = new NamespacedKey(StarMetal.getInstance(), "custom_id");
         if (meta == null) throw new AssertionError();
         try {
             // Check if the persistent data container has the key
-            if (meta.getPersistentDataContainer().has(customIdKey, PersistentDataType.INTEGER)) {
+            if (meta.getPersistentDataContainer().has(customIdKey(), PersistentDataType.INTEGER)) {
                 // Retrieve the value and check for null
-                Integer value = meta.getPersistentDataContainer().get(customIdKey, PersistentDataType.INTEGER);
+                Integer value = meta.getPersistentDataContainer().get(customIdKey(), PersistentDataType.INTEGER);
                 if (value != null && value == compare) {
                     return true;
                 }
@@ -47,12 +47,11 @@ public class ItemHelper {
      */
     public static int getWeaponDamage(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        NamespacedKey custom_id = new NamespacedKey(StarMetal.getInstance(), "custom_id");
         int damage = 0;
 
         // Choose the weapon
         if (meta != null) {
-            Integer weaponId = meta.getPersistentDataContainer().get(custom_id, PersistentDataType.INTEGER);
+            Integer weaponId = meta.getPersistentDataContainer().get(customIdKey(), PersistentDataType.INTEGER);
             if (weaponId != null) {
                 damage = switch (weaponId) {
                     case 0 -> // Venom Staff
@@ -71,6 +70,8 @@ public class ItemHelper {
                             config.getInt("weapons.anime_fan.attack-damage");
                     case 8 -> //Black Clover
                             config.getInt("weapons.black_clover.attack-damage");
+                    case 9 -> // Crystal Reaper
+                            config.getInt("weapons.crystal_reaper.attack-damage");
                     default -> getDefaultDamageValue(item);
                 };
             }
@@ -87,29 +88,20 @@ public class ItemHelper {
             return 1;
         }
 
-        // Check for specific items and return their default damage values
-        return (int) switch (itemStack.getType()) {
-            case IRON_SWORD, MACE, NETHERITE_PICKAXE, NETHERITE_SHOVEL -> 6;
-            case IRON_AXE, DIAMOND_AXE, STONE_AXE, TRIDENT -> 9;
-            case WOODEN_SWORD, GOLDEN_SWORD, IRON_PICKAXE, IRON_SHOVEL -> 4;
-            case STONE_SWORD, DIAMOND_PICKAXE, DIAMOND_SHOVEL -> 5;
-            case DIAMOND_SWORD, GOLDEN_AXE, WOODEN_AXE -> 7;
-            case NETHERITE_SWORD -> 8;
-            case NETHERITE_AXE -> 10;
-            case WOODEN_SHOVEL, WOODEN_PICKAXE, GOLDEN_PICKAXE, GOLDEN_SHOVEL -> 2;
-            case STONE_SHOVEL, STONE_PICKAXE -> 3;
-            // Add more cases for other items as needed
-            default -> {
-                // Check if the item has item meta and attribute modifiers
-                ItemMeta meta = itemStack.getItemMeta();
-                if (meta != null && meta.hasAttributeModifiers()) {
-                    if (Objects.requireNonNull(meta.getAttributeModifiers()).containsKey(Attribute.ATTACK_DAMAGE)) {
-                        yield Objects.requireNonNull(meta.getAttributeModifiers().get(Attribute.ATTACK_DAMAGE)).iterator().next().getAmount();
-                    }
-                }
-                yield 1;
+        var defaultAttackDamage = itemStack.getType().getDefaultAttributeModifiers().get(Attribute.ATTACK_DAMAGE);
+        if (!defaultAttackDamage.isEmpty()) {
+            return (int) defaultAttackDamage.iterator().next().getAmount();
+        }
+
+        // Fall back to explicit item meta for custom items that override attack damage.
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null && meta.hasAttributeModifiers()) {
+            if (Objects.requireNonNull(meta.getAttributeModifiers()).containsKey(Attribute.ATTACK_DAMAGE)) {
+                return (int) Objects.requireNonNull(Objects.requireNonNull(meta.getAttributeModifiers().get(Attribute.ATTACK_DAMAGE)).iterator().next()).getAmount();
             }
-        };
+        }
+        // if everything else fails return 1
+        return 1;
     }
 
     // Overload method defaults to just 1 durability

@@ -3,6 +3,7 @@ package net.jonnegaming.starMetal.Recipes.armor;
 import net.jonnegaming.starMetal.ItemHelper;
 import net.jonnegaming.starMetal.Items.custom_items;
 import net.jonnegaming.starMetal.Items.item_creator;
+import net.jonnegaming.starMetal.StatusDisplay;
 import net.jonnegaming.starMetal.StarMetal;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
@@ -10,16 +11,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.metadata.FixedMetadataValue;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class Opiskelijahaalarit_recipe implements Listener {
-    private final StarMetal plugin;
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private final Set<UUID> notifiedPlayers = new HashSet<>();
 
     public Opiskelijahaalarit_recipe(StarMetal plugin) {
-        this.plugin = plugin;
         registerCraftingRecipe();
     }
 
@@ -48,15 +52,19 @@ public class Opiskelijahaalarit_recipe implements Listener {
                 // Check if the player hasn't already been notified
                 event.getWhoClicked();
                 Player player = (Player) event.getWhoClicked();
+                UUID playerId = player.getUniqueId();
 
                 // Store the state to avoid sending the message multiple times
-                if (!player.hasMetadata("opiskelijahaalaritEquipped")) {
-                    player.setMetadata("opiskelijahaalaritEquipped", new FixedMetadataValue(plugin, true));
-
+                if (notifiedPlayers.add(playerId)) {
                     // Send the message only once
-                    player.sendActionBar(miniMessage.deserialize("<!i><green>"+ "You have equipped Opiskelijahaalarit with Curse of Binding!"));
+                    StatusDisplay.showTemporary(player, miniMessage.deserialize("<!i><green>You have equipped Opiskelijahaalarit with Curse of Binding!"), 40L);
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        notifiedPlayers.remove(event.getPlayer().getUniqueId());
     }
 }

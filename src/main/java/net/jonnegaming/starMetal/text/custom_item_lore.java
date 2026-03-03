@@ -88,4 +88,13 @@ public class custom_item_lore {
         lore.add(miniMessage.deserialize("<!i><white>Due to weapons big size you move slower."));
         return lore;
     }
+
+    public static List<Component> crystal_reaper_lore() {
+        List<Component> lore = new ArrayList<>();
+        lore.add(miniMessage.deserialize("<!i><gold>Ability: Crystal Skull"));
+        lore.add(miniMessage.deserialize("<!i><white>Launches a giant charged wither skull on right click."));
+        lore.add(miniMessage.deserialize("<!i><white>Creates a larger explosion on impact."));
+        lore.add(miniMessage.deserialize("<!i><white>Has a 0.5 second cooldown"));
+        return lore;
+    }
 }

@@ -8,6 +8,7 @@ import net.jonnegaming.starMetal.energy.cooldowns;
 import net.jonnegaming.starMetal.projectiles.projectile_launcher;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,27 +18,26 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 
-public class doom_sword_recipe implements Listener {
-    private static final String COOLDOWN_KEY = "doom_sword";
-    private static final long COOLDOWN_TIME = 2000;
+public class crystal_reaper_recipe implements Listener {
+    private static final String COOLDOWN_KEY = "crystal_reaper";
+    private static final long COOLDOWN_TIME = 500;
     private final StarMetal plugin;
 
-    public doom_sword_recipe(StarMetal plugin) {
+    public crystal_reaper_recipe(StarMetal plugin) {
         this.plugin = plugin;
         registerCraftingRecipe();
     }
 
     private void registerCraftingRecipe() {
-        ItemStack result = custom_items.doom_sword();
+        ItemStack result = custom_items.crystal_reaper();
 
-        NamespacedKey key = new NamespacedKey(plugin, "doom_sword_recipe");
+        NamespacedKey key = new NamespacedKey(plugin, "crystal_reaper_recipe");
         ShapedRecipe sr = new ShapedRecipe(key, result);
-        sr.shape(" X ", " X ", " Y ");
-
-        sr.setIngredient('X', Material.NETHERITE_BLOCK);
+        sr.shape(" X ", " Y ", " Y ");
+        sr.setIngredient('X', Material.END_CRYSTAL);
         sr.setIngredient('Y', Material.STICK);
 
-        item_creator.registerRecipe(sr, "Doom Sword");
+        item_creator.registerRecipe(sr, "Crystal Reaper");
     }
 
     @EventHandler
@@ -46,26 +46,17 @@ public class doom_sword_recipe implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
 
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() == Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-        // Only allow custom item
-        if (ItemHelper.isCustomItem(item, 5)) {
-            // Don't shoot if on cooldown
+        if (ItemHelper.isCustomItem(item, 9)) {
             if (cooldowns.isOnCooldown(player, COOLDOWN_KEY, COOLDOWN_TIME)) {
                 return;
             }
 
-            // override vanilla event
             event.setCancelled(true);
-
-            //Shooting logic
-            projectile_launcher.launchFireball(player, "doom_sword");
-
-            // reduce durability
-            ItemHelper.reduceDurability(player, item, 3);
-
-            // Put the item into cooldown
-            cooldowns.run_cooldown(player, COOLDOWN_KEY, COOLDOWN_TIME, "Doom Sword");
+            projectile_launcher.launchWitherSkull(player, "crystal_reaper", 1.5, true, Sound.ENTITY_WITHER_SHOOT);
+            ItemHelper.reduceDurability(player, item, 4);
+            cooldowns.run_cooldown(player, COOLDOWN_KEY, COOLDOWN_TIME, "Crystal Reaper");
         }
     }
 }

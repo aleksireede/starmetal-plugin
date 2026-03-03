@@ -2,7 +2,6 @@ package net.jonnegaming.starMetal.listeners;
 
 import net.jonnegaming.starMetal.StarMetal;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -10,6 +9,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import static net.jonnegaming.starMetal.config.customIdKey;
 
 public class custom_armor_checker implements Listener {
     private final StarMetal plugin;
@@ -30,17 +31,17 @@ public class custom_armor_checker implements Listener {
     }
 
     private void checkLeggings(Player player) {
-        NamespacedKey custom_id = new NamespacedKey(StarMetal.getInstance(), "custom_id");
         ItemStack leggings = player.getInventory().getLeggings();
         if (leggings == null)return;
-        ItemMeta pants_meta = leggings.getItemMeta();
-        if (pants_meta == null)return;
-        if (pants_meta.getPersistentDataContainer().has(custom_id)) {
-            switch (pants_meta.getPersistentDataContainer().get(custom_id, PersistentDataType.INTEGER)) {
-                case 4 -> player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 100, 1, false, false));
-                case null, default -> {
-                }
-            }
+        ItemMeta leggings_meta = leggings.getItemMeta();
+        if (leggings_meta == null)return;
+        Integer customId = leggings_meta.getPersistentDataContainer().get(customIdKey(), PersistentDataType.INTEGER);
+        if (customId == null) {
+            return;
+        }
+
+        if (customId == 4) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 100, 1, false, false));
         }
     }
 }
