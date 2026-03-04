@@ -43,6 +43,7 @@ public class animestaff_recipe implements Listener {
         item_creator.registerRecipe(sr, "Anime_Staff");
     }
 
+    // Anime staff shooting logic
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();

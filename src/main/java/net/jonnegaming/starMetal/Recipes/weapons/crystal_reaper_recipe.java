@@ -46,7 +46,7 @@ public class crystal_reaper_recipe implements Listener {
         ItemStack item = player.getInventory().getItemInMainHand();
 
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getAction() != Action.RIGHT_CLICK_AIR) return;
 
         if (ItemHelper.isCustomItem(item, 9)) {
             if (cooldowns.isOnCooldown(player, COOLDOWN_KEY, COOLDOWN_TIME)) {

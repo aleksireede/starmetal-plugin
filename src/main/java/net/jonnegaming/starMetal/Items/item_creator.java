@@ -113,6 +113,7 @@ public class item_creator {
         if (meta != null) {
             meta.customName(MINI_MESSAGE.deserialize(getColorFromRarity(rarity) + name));
 
+            // Custom texture from texture pack
             NamespacedKey metaKey = new NamespacedKey(StarMetal.getInstance(), cleanString(name).toLowerCase());
             meta.setItemModel(metaKey);
 

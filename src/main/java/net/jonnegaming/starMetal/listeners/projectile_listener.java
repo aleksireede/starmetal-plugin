@@ -9,7 +9,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -85,19 +85,18 @@ public class projectile_listener implements Listener {
 
         if (event.getEntity() instanceof WitherSkull witherSkull
                 && witherSkull.getPersistentDataContainer().has(CRYSTAL_REAPER_PROJECTILE_KEY, PersistentDataType.BYTE)) {
-            witherSkull.getWorld().createExplosion(witherSkull.getLocation(), 7.0F, false, true, witherSkull);
+            witherSkull.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, witherSkull.getLocation(), 1);
+            witherSkull.getWorld().spawnParticle(Particle.SMOKE, witherSkull.getLocation(), 24, 0.4, 0.4, 0.4, 0.02);
+            witherSkull.getWorld().playSound(witherSkull.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.0F);
         }
     }
 
-    // Event handler to cancel block damage from our TNT explosions
+    // Prevent Crystal Reaper skulls from creating a real explosion.
     @EventHandler
-    public void onEntityExplode(EntityExplodeEvent event) {
+    public void onExplosionPrime(ExplosionPrimeEvent event) {
         if (event.getEntity() instanceof WitherSkull witherSkull
                 && witherSkull.getPersistentDataContainer().has(CRYSTAL_REAPER_PROJECTILE_KEY, PersistentDataType.BYTE)) {
-            event.setYield(7.0F);
-        }
-        if (event.getEntity().hasMetadata("no_block_damage")) {
-            event.blockList().clear(); // Prevent block damage
+            event.setCancelled(true);
         }
     }
 }

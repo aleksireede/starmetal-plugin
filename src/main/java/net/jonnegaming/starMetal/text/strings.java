@@ -7,7 +7,7 @@ public class strings {
         String cleanedString = input.replaceAll("[^a-zA-Z0-9 ]", "");
 
         // Replace spaces with underscores
-        cleanedString = cleanedString.replaceAll(" ", "_");
+        cleanedString = cleanedString.replace(" ", "_");
 
         return cleanedString;
     }

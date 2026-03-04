@@ -1,6 +1,8 @@
 package net.jonnegaming.starMetal.listeners;
 
 import net.jonnegaming.starMetal.StarMetal;
+import net.kyori.adventure.resource.ResourcePackInfo;
+import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
@@ -13,6 +15,9 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Duration;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class join_events implements Listener {
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
@@ -41,7 +46,27 @@ public class join_events implements Listener {
             return;
         }
 
-        player.setResourcePack(url, packHash, required, prompt);
+        String normalizedHash = packHash == null ? "" : packHash.trim();
+        if (!normalizedHash.matches("(?i)[0-9a-f]{40}")) {
+            StarMetal.getInstance().getLogger().warning("Invalid resource-pack.hash in config.yml. Expected a 40-character SHA-1 hex digest.");
+            return;
+        }
+
+        try {
+            URI resourcePackUri = URI.create(url);
+            UUID resourcePackId = UUID.nameUUIDFromBytes((url + ":" + normalizedHash).getBytes(StandardCharsets.UTF_8));
+            ResourcePackInfo resourcePackInfo = ResourcePackInfo.resourcePackInfo(resourcePackId, resourcePackUri, normalizedHash);
+            ResourcePackRequest request = ResourcePackRequest.resourcePackRequest()
+                    .packs(resourcePackInfo)
+                    .required(required)
+                    .prompt(prompt)
+                    .replace(false)
+                    .build();
+
+            player.sendResourcePacks(request);
+        } catch (IllegalArgumentException exception) {
+            StarMetal.getInstance().getLogger().warning("Invalid resource-pack.url in config.yml: " + exception.getMessage());
+        }
     }
 
     private void makePlayerInvulnerable(Player player, long ticks) {

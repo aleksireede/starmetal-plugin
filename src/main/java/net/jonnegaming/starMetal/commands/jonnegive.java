@@ -36,11 +36,13 @@ public class jonnegive implements BasicCommand {
         return "starmetal.jonnegivecommand";
     }
 
+    // Create a command that gives a shulker box full of custom items
     private static void giveCustomItems(Player player) {
         PlayerInventory inv = player.getInventory();
         inv.addItem(createCustomItemBox());
     }
 
+    // Create the custom shulker box
     private static ItemStack createCustomItemBox() {
         ItemStack shulkerBoxItem = new ItemStack(Material.PURPLE_SHULKER_BOX);
         BlockStateMeta meta = (BlockStateMeta) shulkerBoxItem.getItemMeta();

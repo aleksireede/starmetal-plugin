@@ -1,5 +1,5 @@
 name: StarMetal
-version: '1.1'
+version: '1.2'
 main: net.jonnegaming.starMetal.StarMetal
 api-version: '1.21'
 permissions:
