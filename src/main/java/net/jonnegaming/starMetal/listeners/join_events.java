@@ -1,10 +1,9 @@
 package net.jonnegaming.starMetal.listeners;
 
+import io.github.aleksireede.hammershared.SharedResourcePackManager;
+import io.github.aleksireede.hammershared.SharedText;
 import net.jonnegaming.starMetal.StarMetal;
-import net.kyori.adventure.resource.ResourcePackInfo;
-import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -15,58 +14,20 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Duration;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 public class join_events implements Listener {
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         FileConfiguration config = StarMetal.getInstance().getConfig();
 
-        // Send resource pack using Adventure API
-        sendResourcePack(
-                player,
-                config.getString("resource-pack.url", ""),
-                config.getString("resource-pack.hash", ""),
-                config.getBoolean("resource-pack.required", true),
-                miniMessage.deserialize(config.getString("resource-pack.prompt", ""))
-        );
+        SharedResourcePackManager packManager = SharedResourcePackManager.fromConfig(StarMetal.getInstance(), config);
+        if (packManager.isEnabled() && packManager.shouldSendOnJoin()) {
+            packManager.sendToPlayer(player);
+        }
 
-        // Make player invulnerable for 300 ticks (15 seconds)
         makePlayerInvulnerable(player, config.getInt("resource-pack.invulnerable-ticks", 300));
-
-    }
-
-    private void sendResourcePack(Player player, String url, String packHash, boolean required, Component prompt) {
-        if (url == null || url.isBlank()) {
-            return;
-        }
-
-        String normalizedHash = packHash == null ? "" : packHash.trim();
-        if (!normalizedHash.matches("(?i)[0-9a-f]{40}")) {
-            StarMetal.getInstance().getLogger().warning("Invalid resource-pack.hash in config.yml. Expected a 40-character SHA-1 hex digest.");
-            return;
-        }
-
-        try {
-            URI resourcePackUri = URI.create(url);
-            UUID resourcePackId = UUID.nameUUIDFromBytes((url + ":" + normalizedHash).getBytes(StandardCharsets.UTF_8));
-            ResourcePackInfo resourcePackInfo = ResourcePackInfo.resourcePackInfo(resourcePackId, resourcePackUri, normalizedHash);
-            ResourcePackRequest request = ResourcePackRequest.resourcePackRequest()
-                    .packs(resourcePackInfo)
-                    .required(required)
-                    .prompt(prompt)
-                    .replace(false)
-                    .build();
-
-            player.sendResourcePacks(request);
-        } catch (IllegalArgumentException exception) {
-            StarMetal.getInstance().getLogger().warning("Invalid resource-pack.url in config.yml: " + exception.getMessage());
-        }
     }
 
     private void makePlayerInvulnerable(Player player, long ticks) {
@@ -84,22 +45,17 @@ public class join_events implements Listener {
         Player player = event.getPlayer();
         PlayerResourcePackStatusEvent.Status status = event.getStatus();
 
-        // Check if the resource pack was successfully loaded
         if (status == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
             FileConfiguration config = StarMetal.getInstance().getConfig();
-            // Send a message to the player
-            // Create the title and subtitle components with Adventure's text formatting
-            Component title = miniMessage.deserialize("<aqua>" + config.getString("resource-pack.welcome-title", "Welcome"));
-            Component subtitle = miniMessage.deserialize("<rainbow>" + config.getString("resource-pack.welcome-subtitle", "to Jonne Gaming Server!"));
+            Component title = SharedText.miniMessage("<aqua>" + config.getString("resource-pack.welcome-title", "Welcome"));
+            Component subtitle = SharedText.miniMessage("<rainbow>" + config.getString("resource-pack.welcome-subtitle", "to Jonne Gaming Server!"));
 
-            // Create a title with the specified components and timing
             Title welcomeTitle = Title.title(title, subtitle, Title.Times.times(
                     Duration.ofSeconds(config.getLong("resource-pack.title-fade-in-seconds", 1)),
                     Duration.ofSeconds(config.getLong("resource-pack.title-stay-seconds", 3)),
                     Duration.ofSeconds(config.getLong("resource-pack.title-fade-out-seconds", 1))
             ));
 
-            // Send the title to the player
             player.showTitle(welcomeTitle);
         }
     }

@@ -1,8 +1,8 @@
 package net.jonnegaming.starMetal.energy;
 
+import io.github.aleksireede.hammershared.SharedText;
 import net.jonnegaming.starMetal.StatusDisplay;
 import net.jonnegaming.starMetal.StarMetal;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -16,7 +16,6 @@ public class cooldowns {
     private static final HashSet<UUID> reloading = new HashSet<>(); // Track players in reload state
     private static final Map<UUID, Integer> energy = new HashMap<>();
     private static final int MAX_energy = 5;
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     // Cooldown logic timer and display
     public static void run_cooldown(Player player, String cooldownKey, long COOLDOWN_TIME, String weapon) {
@@ -31,12 +30,12 @@ public class cooldowns {
                 if (remainingTime > 0) {
                     StatusDisplay.show(
                             player,
-                            miniMessage.deserialize("<!i><red>" + weapon + " Cooldown: " + String.format("%.1f", remainingTime) + "s"),
+                            SharedText.miniMessage("<!i><red>" + weapon + " Cooldown: " + String.format("%.1f", remainingTime) + "s"),
                             (float) (remainingTime / (COOLDOWN_TIME / 1000.0))
                     );
                     remainingTime -= 0.1;
                 } else {
-                    StatusDisplay.showTemporary(player, miniMessage.deserialize("<!i><green>" + weapon + " Ability Ready!"), 40L);
+                    StatusDisplay.showTemporary(player, SharedText.miniMessage("<!i><green>" + weapon + " Ability Ready!"), 40L);
                     cancel();
                 }
             }
@@ -85,12 +84,12 @@ public class cooldowns {
                 if (timeLeft <= 0) {
                     energy.put(playerId, MAX_energy);
                     reloading.remove(playerId);
-                    StatusDisplay.showTemporary(player, miniMessage.deserialize("<!i><green>Energy Reload complete!"), 40L);
+                    StatusDisplay.showTemporary(player, SharedText.miniMessage("<!i><green>Energy Reload complete!"), 40L);
                     cancel();
                 } else {
                     StatusDisplay.show(
                             player,
-                            miniMessage.deserialize("<!i><red>Reloading Energy..." + String.format("%.1f", timeLeft / 1000.0) + "s"),
+                            SharedText.miniMessage("<!i><red>Reloading Energy..." + String.format("%.1f", timeLeft / 1000.0) + "s"),
                             (float) timeLeft / RELOAD_TIME
                     );
                 }

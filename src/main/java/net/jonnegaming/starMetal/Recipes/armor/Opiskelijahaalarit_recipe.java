@@ -1,11 +1,11 @@
 package net.jonnegaming.starMetal.Recipes.armor;
 
+import io.github.aleksireede.hammershared.SharedText;
 import net.jonnegaming.starMetal.ItemHelper;
 import net.jonnegaming.starMetal.Items.custom_items;
 import net.jonnegaming.starMetal.Items.item_creator;
 import net.jonnegaming.starMetal.StatusDisplay;
 import net.jonnegaming.starMetal.StarMetal;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public class Opiskelijahaalarit_recipe implements Listener {
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final Set<UUID> notifiedPlayers = new HashSet<>();
 
     public Opiskelijahaalarit_recipe(StarMetal plugin) {
@@ -57,7 +56,7 @@ public class Opiskelijahaalarit_recipe implements Listener {
                 // Store the state to avoid sending the message multiple times
                 if (notifiedPlayers.add(playerId)) {
                     // Send the message only once
-                    StatusDisplay.showTemporary(player, miniMessage.deserialize("<!i><green>You have equipped Opiskelijahaalarit with Curse of Binding!"), 40L);
+                    StatusDisplay.showTemporary(player, SharedText.miniMessage("<!i><green>You have equipped Opiskelijahaalarit with Curse of Binding!"), 40L);
                 }
             }
         }

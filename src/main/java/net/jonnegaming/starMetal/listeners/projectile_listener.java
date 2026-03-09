@@ -58,7 +58,7 @@ public class projectile_listener implements Listener {
                 } else {
                     // If the hand is empty, you might want to handle it differently
                     player.playSound(enemy.getLocation(), Sound.ENTITY_SKELETON_DEATH, 1F, 1F);
-                    player.spawnParticle(Particle.BLOCK, enemy.getLocation(), 1);
+                    player.spawnParticle(Particle.ASH, enemy.getLocation(), 1);
                 }
             }
             default -> {

@@ -1,6 +1,8 @@
 package net.jonnegaming.starMetal.listeners;
 
 import net.jonnegaming.starMetal.Items.item_updater;
+import net.jonnegaming.starMetal.StarMetal;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -160,7 +162,10 @@ public class item_listener implements Listener {
      //Triggered when enchanting
     @EventHandler
     public void onEnchant (EnchantItemEvent event){
-        updateItem(event.getItem());
+        final ItemStack item = event.getItem();
+        // Enchantments are applied after the event fires, so delay by one tick
+        // to ensure the item has its new enchantments when we rebuild the lore.
+        Bukkit.getScheduler().runTask(StarMetal.getInstance(), () -> updateItem(item));
     }
 
     //Triggered on block drops

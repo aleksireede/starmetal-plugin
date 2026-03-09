@@ -2,6 +2,12 @@ name: StarMetal
 version: '1.2'
 main: net.jonnegaming.starMetal.StarMetal
 api-version: '1.21'
+dependencies:
+  server:
+    HammerSharedLib:
+      load: BEFORE
+      required: true
+      join-classpath: true
 permissions:
   starmetal.jonnegivecommand:
     description: "This is a permission node"

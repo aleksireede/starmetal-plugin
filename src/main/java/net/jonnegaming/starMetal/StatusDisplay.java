@@ -1,8 +1,8 @@
 package net.jonnegaming.starMetal;
 
+import io.github.aleksireede.hammershared.SharedText;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.TitlePart;
 import org.bukkit.Bukkit;
@@ -19,7 +19,6 @@ import java.util.UUID;
 
 public final class StatusDisplay {
     private static final String OBJECTIVE_NAME = "starmetal_status";
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
     private static final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.legacySection();
     private static final Map<UUID, BossBar> bossBars = new HashMap<>();
     private static final Map<UUID, Scoreboard> previousScoreboards = new HashMap<>();
@@ -165,7 +164,7 @@ public final class StatusDisplay {
     private static Component getScoreboardTitle() {
         FileConfiguration config = StarMetal.getInstance().getConfig();
         String title = config.getString("ui.scoreboard-title", "<gold>StarMetal");
-        return miniMessage.deserialize(title);
+        return SharedText.miniMessage(title);
     }
 
     private static void clearBossBar(Player player) {

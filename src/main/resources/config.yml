@@ -9,11 +9,17 @@ ui:
   status-display-mode: boss_bar
   scoreboard-title: "<gold>StarMetal"
 
-resource-pack:
-  url: "https://www.dropbox.com/scl/fi/och0h1871e9gxs0sjitfg/starmetal_resourcepack.zip?rlkey=0165kyc9mj6wqe3r8l40tx075&st=bj1f417m&dl=1"
-  hash: "5c2689bb7dd3a9305d53edde12aea3cad24f9a3e"
-  prompt: "Tama resurssipaketti tarvitaan nayttamaan modatut esineet./This resource pack is required to show modded items."
+shared-resource-pack:
+  enabled: true
+  send-on-join: true
   required: true
+  packs:
+    - url: "https://www.dropbox.com/scl/fi/och0h1871e9gxs0sjitfg/starmetal_resourcepack.zip?rlkey=0165kyc9mj6wqe3r8l40tx075&st=bj1f417m&dl=1"
+      sha1: "5c2689bb7dd3a9305d53edde12aea3cad24f9a3e"
+      prompt: "Tama resurssipaketti tarvitaan nayttamaan modatut esineet./This resource pack is required to show modded items."
+      required: true
+
+resource-pack:
   invulnerable-ticks: 300
   welcome-title: "Welcome"
   welcome-subtitle: "to Jonne Gaming Server!"

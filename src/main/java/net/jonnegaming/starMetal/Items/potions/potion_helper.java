@@ -1,15 +1,14 @@
 package net.jonnegaming.starMetal.Items.potions;
 
+import io.github.aleksireede.hammershared.SharedText;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class potion_helper {
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     /**
      * Creates a potion item with a base potion type, one custom effect, and a custom display name.
@@ -31,7 +30,7 @@ public class potion_helper {
         if (potionMeta != null) {
             potionMeta.setBasePotionType(type);
             potionMeta.addCustomEffect(new PotionEffect(effect_type, duration, amplifier), true);
-            potionMeta.customName(miniMessage.deserialize(displayName));
+            potionMeta.customName(SharedText.miniMessage(displayName));
             potion.setItemMeta(potionMeta);
         }
         return potion;

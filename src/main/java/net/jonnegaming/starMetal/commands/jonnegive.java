@@ -1,9 +1,9 @@
 package net.jonnegaming.starMetal.commands;
 
+import io.github.aleksireede.hammershared.SharedText;
 import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.jonnegaming.starMetal.Items.custom_items;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.command.CommandSender;
@@ -17,7 +17,6 @@ import static net.jonnegaming.starMetal.Items.potions.hastepotion.*;
 import static net.jonnegaming.starMetal.Items.potions.speedpotion.*;
 
 public class jonnegive implements BasicCommand {
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @Override
     public void execute(CommandSourceStack commandSourceStack, String @NonNull [] args) {
@@ -89,7 +88,7 @@ public class jonnegive implements BasicCommand {
         );
 
         meta.setBlockState(shulkerBox);
-        meta.customName(miniMessage.deserialize("<rainbow>StarMetal <light_purple>Item Cache"));
+        meta.customName(SharedText.miniMessage("<rainbow>StarMetal <light_purple>Item Cache"));
         shulkerBoxItem.setItemMeta(meta);
         return shulkerBoxItem;
     }

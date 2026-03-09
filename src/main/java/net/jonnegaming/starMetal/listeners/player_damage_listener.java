@@ -1,10 +1,10 @@
 package net.jonnegaming.starMetal.listeners;
 
+import net.jonnegaming.starMetal.helpers.DamageHelper;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,14 +13,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
 
 import static net.jonnegaming.starMetal.config.customIdKey;
-import static net.jonnegaming.starMetal.ItemHelper.getDefaultDamageValue;
-import static net.jonnegaming.starMetal.ItemHelper.getWeaponDamage;
 
 public class player_damage_listener implements Listener {
     private final NamespacedKey custom_id = customIdKey();
@@ -47,96 +43,16 @@ public class player_damage_listener implements Listener {
         }
     }
 
-    /**
-     * Check if the entity is undead (e.g., zombie, skeleton, stray, husk, zombified piglin, drowned)
-     */
-    private boolean isUndead(Entity entity) {
-        return entity instanceof LivingEntity && (
-                entity.getType().name().contains("ZOMBIE") ||
-                        entity.getType().name().contains("SKELETON") ||
-                        entity.getType().name().contains("STRAY") ||
-                        entity.getType().name().contains("HUSK") ||
-                        entity.getType().name().contains("PIGLIN") ||
-                        entity.getType().name().contains("DROWNED") ||
-                        entity.getType().name().contains("PHANTOM")
-        );
-    }
 
     /**
-     * Check if the entity is an arthropod (e.g., spider, cave spider, silverfish, endermite)
-     */
-    private boolean isArthropod(Entity entity) {
-        return entity instanceof LivingEntity && (
-                entity.getType().name().contains("SPIDER") ||
-                        entity.getType().name().contains("SILVERFISH") ||
-                        entity.getType().name().contains("ENDERMITE")
-        );
-    }
-
-    /**
-     * Event handler for calculating weapon damage on hit
+     * Event handler for calculating weapon damage caused by player
      */
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         // ensure that the player is the one using the weapon to make damage
         if (event.getDamager() instanceof Player player) {
-            ItemStack item = player.getInventory().getItemInMainHand();
-
-            // Get weapon damage amount
-            double baseDamage = getWeaponDamage(item);
-
-            // Calculate damage modifiers
-            double damageMultiplier = 1.0;
-
-            // Strength effect
-            if (player.hasPotionEffect(PotionEffectType.STRENGTH)) {
-                PotionEffect strengthEffect = player.getPotionEffect(PotionEffectType.STRENGTH);
-                if (strengthEffect == null) throw new AssertionError();
-                int strengthLevel = strengthEffect.getAmplifier() + 1;
-                damageMultiplier += 0.05 * strengthLevel;
-            }
-
-            // Weakness effect
-            if (player.hasPotionEffect(PotionEffectType.WEAKNESS)) {
-                PotionEffect weaknessEffect = player.getPotionEffect(PotionEffectType.WEAKNESS);
-                if (weaknessEffect == null) throw new AssertionError();
-                int weaknessLevel = weaknessEffect.getAmplifier() + 1;
-                damageMultiplier -= 0.05 * weaknessLevel;
-            }
-
-            // Sharpness enchantment
-            if (item.hasItemMeta() && Objects.requireNonNull(item.getItemMeta()).hasEnchants()) {
-                int sharpnessLevel = item.getEnchantmentLevel(Enchantment.SHARPNESS);
-                damageMultiplier += 0.05 * sharpnessLevel;
-            }
-
-            // Smite enchantment
-            if (item.hasItemMeta() && Objects.requireNonNull(item.getItemMeta()).hasEnchants()) {
-                int smiteLevel = item.getEnchantmentLevel(Enchantment.SMITE);
-                if (smiteLevel > 0 && isUndead(event.getEntity())) {
-                    damageMultiplier += 0.05 * smiteLevel;
-                }
-            }
-
-            // Bane of Arthropods enchantment
-            if (item.hasItemMeta() && Objects.requireNonNull(item.getItemMeta()).hasEnchants()) {
-                int baneOfArthropodsLevel = item.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS);
-                if (baneOfArthropodsLevel > 0 && isArthropod(event.getEntity())) {
-                    damageMultiplier += 0.05 * baneOfArthropodsLevel;
-                }
-            }
-
-            if (baseDamage == 0) {
-                baseDamage = getDefaultDamageValue(item);
-            }
-
-            // Cap the max damage to +75%
-            if (damageMultiplier > 75) {
-                damageMultiplier = 75;
-            }
-
-            // Calculate final damage
-            double finalDamage = baseDamage * damageMultiplier;
+            Entity target = event.getEntity();
+            double finalDamage = DamageHelper.WeaponDamage(player, target);
             event.setDamage(finalDamage);
 
             // Calculate armor protections
@@ -144,7 +60,7 @@ public class player_damage_listener implements Listener {
     }
 
     /**
-     * Calculate damage to players based on the armor and enchants the player has
+     * Calculate armor protection against damage
      */
     @EventHandler
     public void onPlayerHit(EntityDamageEvent event) {
@@ -181,7 +97,7 @@ public class player_damage_listener implements Listener {
 
                 // Get the base protection value of the armor piece
                 Integer customId = meta.getPersistentDataContainer().get(customIdKey(), PersistentDataType.INTEGER);
-                if (customId != null){
+                if (customId != null) {
                     int custom_id = customId;
                     protection += getCustomArmorProtectionValue(custom_id);
                 } else {
@@ -239,14 +155,17 @@ public class player_damage_listener implements Listener {
 
     /**
      * Get the initial armor value from custom items
+     *
      * @param custom_id custom id (int)
      */
-    private double getCustomArmorProtectionValue(Integer custom_id){
+    private double getCustomArmorProtectionValue(Integer custom_id) {
         int val = 0;
-        switch (custom_id){
+        switch (custom_id) {
             // 4 is the number corresponding to opiskelijahaalarit
-            case 4: val = 8;
-            case null, default: {}
+            case 4:
+                val = 8;
+            case null, default: {
+            }
         }
         return val;
     }

@@ -119,30 +119,39 @@ public class ItemHelper {
             return;
         }
 
-        // Break item when 0 or less durability left
-        if (item.getType().getMaxDurability() <= damageable.getDamage()) {
-            player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
-            // Get the item in the main hand
-            ItemStack itemInHand = player.getInventory().getItemInMainHand();
-            // Check if the item is not air (empty hand)
-            if (itemInHand.getType() != Material.AIR) {
-                // Set the particle to match the item in hand
-                player.spawnParticle(Particle.BLOCK, player.getLocation(), 1);
-                // Play the sound
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1F, 1F);
-            } else {
-                // If the hand is empty, you might want to handle it differently
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1F, 1F);
-                player.spawnParticle(Particle.BLOCK, player.getLocation(), 1);
+        int durabilityLoss = (amount == null || amount < 1) ? 1 : amount;
+        int maxDurability = item.getType().getMaxDurability();
+        int currentDamage = damageable.getDamage();
+
+        // Break when this hit would consume the remaining durability.
+        if (currentDamage + durabilityLoss >= maxDurability) {
+            ItemStack brokenItem = item.clone();
+            removeItemFromHands(player, item);
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1F, 1F);
+            if (brokenItem.getType() != Material.AIR) {
+                player.spawnParticle(Particle.ITEM, player.getLocation(), 8, brokenItem);
             }
             return;
         }
 
         // Reduce the durability
-        int newDamage = damageable.getDamage() + amount; // Increase damage by 1
+        int newDamage = currentDamage + durabilityLoss;
         damageable.setDamage(newDamage);
 
         // Set the modified ItemMeta back to the ItemStack
         item.setItemMeta(meta);
+    }
+
+    private static void removeItemFromHands(Player player, ItemStack item) {
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        if (mainHand == item || mainHand.equals(item)) {
+            player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+            return;
+        }
+
+        ItemStack offHand = player.getInventory().getItemInOffHand();
+        if (offHand == item || offHand.equals(item)) {
+            player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
+        }
     }
 }

@@ -1,28 +1,25 @@
 package net.jonnegaming.starMetal;
 
+import io.github.aleksireede.hammershared.SharedItemKeys;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class config {
     public static FileConfiguration config;
 
-    private static String getMetadataKeyName(String path, String fallback) {
-        return StarMetal.getInstance().getConfig().getString("metadata-keys." + path, fallback);
-    }
-
     public static NamespacedKey customIdKey() {
-        return new NamespacedKey(StarMetal.getInstance(), getMetadataKeyName("custom-id", "custom_id"));
+        return SharedItemKeys.customIdKey();
     }
 
     public static NamespacedKey rarityKey() {
-        return new NamespacedKey(StarMetal.getInstance(), getMetadataKeyName("rarity", "rarity"));
+        return SharedItemKeys.rarityKey();
     }
 
     public static NamespacedKey itemTypeKey() {
-        return new NamespacedKey(StarMetal.getInstance(), getMetadataKeyName("item-type", "item_type"));
+        return SharedItemKeys.itemTypeKey();
     }
 
     public static NamespacedKey healthKey() {
-        return new NamespacedKey(StarMetal.getInstance(), getMetadataKeyName("health", "health"));
+        return SharedItemKeys.healthKey();
     }
 }
