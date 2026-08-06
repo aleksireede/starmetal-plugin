@@ -6,7 +6,7 @@ metadata-keys:
 
 ui:
   # action_bar, title, subtitle, boss_bar, scoreboard, chat
-  status-display-mode: boss_bar
+  status-display-mode: action_bar
   scoreboard-title: "<gold>StarMetal"
 
 shared-resource-pack:

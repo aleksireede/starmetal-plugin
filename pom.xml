@@ -86,6 +86,12 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.18.0</version>
             </dependency>
+            <!-- Force plexus-utils >= 4.0.3 to fix CVE-2025-67030 (path traversal in Expand.extractFile) -->
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>4.0.3</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
