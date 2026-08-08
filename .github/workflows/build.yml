@@ -24,12 +24,17 @@ jobs:
           distribution: temurin
           java-version: 25
           cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
       - name: Build
         run: mvn -B clean package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
           name: jar
-          path: target/*.jar
+          path: target/starmetal.jar
