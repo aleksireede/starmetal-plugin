@@ -32,7 +32,6 @@ public class custom_armor_checker implements Listener {
 
     private void checkLeggings(Player player) {
         ItemStack leggings = player.getInventory().getLeggings();
-        if (leggings == null)return;
         ItemMeta leggings_meta = leggings.getItemMeta();
         if (leggings_meta == null)return;
         Integer customId = leggings_meta.getPersistentDataContainer().get(customIdKey(), PersistentDataType.INTEGER);

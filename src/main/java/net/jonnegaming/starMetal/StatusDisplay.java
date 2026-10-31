@@ -52,10 +52,6 @@ public final class StatusDisplay {
         }
     }
 
-    public static void show(Player player, Component message) {
-        show(player, message, 1.0f);
-    }
-
     public static void show(Player player, Component message, float progress) {
         Mode mode = Mode.fromConfig(StarMetal.getInstance().getConfig().getString("ui.status-display-mode"));
         clearTokens.merge(player.getUniqueId(), 1, Integer::sum);

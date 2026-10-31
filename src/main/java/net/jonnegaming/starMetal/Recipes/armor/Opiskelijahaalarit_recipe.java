@@ -5,7 +5,6 @@ import net.jonnegaming.starMetal.ItemHelper;
 import net.jonnegaming.starMetal.Items.custom_items;
 import net.jonnegaming.starMetal.Items.item_creator;
 import net.jonnegaming.starMetal.StatusDisplay;
-import net.jonnegaming.starMetal.StarMetal;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,7 +21,7 @@ import java.util.UUID;
 public class Opiskelijahaalarit_recipe implements Listener {
     private final Set<UUID> notifiedPlayers = new HashSet<>();
 
-    public Opiskelijahaalarit_recipe(StarMetal plugin) {
+    public Opiskelijahaalarit_recipe() {
         registerCraftingRecipe();
     }
 

@@ -15,7 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import static net.jonnegaming.starMetal.config.config;
 
-@SuppressWarnings("UnstableApiUsage")
 public final class StarMetal extends JavaPlugin {
     private static StarMetal instance;
     public static StarMetal getInstance() {
@@ -51,7 +50,7 @@ public final class StarMetal extends JavaPlugin {
         SharedItemUpdater.registerLore(8, custom_item_lore::black_clover_lore);
         SharedItemUpdater.registerLore(9, custom_item_lore::crystal_reaper_lore);
 
-        getLogger().info("Custom Crafting Plugin Enabled!");
+        /* Register all methods and listeners */
         Bukkit.getPluginManager().registerEvents(new haste_potion_recipe(),this);
         Bukkit.getPluginManager().registerEvents(new speed_potion_recipe(),this);
         Bukkit.getPluginManager().registerEvents(new animestaff_recipe(this),this);
@@ -59,7 +58,7 @@ public final class StarMetal extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new shadow_dagger_recipe(this),this);
         Bukkit.getPluginManager().registerEvents(new rose_dagger_recipe(this),this);
         Bukkit.getPluginManager().registerEvents(new jedi_lightsaber_recipe(this),this);
-        Bukkit.getPluginManager().registerEvents(new Opiskelijahaalarit_recipe(this),this);
+        Bukkit.getPluginManager().registerEvents(new Opiskelijahaalarit_recipe(),this);
         Bukkit.getPluginManager().registerEvents(new doom_sword_recipe(this),this);
         Bukkit.getPluginManager().registerEvents(new crystal_reaper_recipe(this),this);
         Bukkit.getPluginManager().registerEvents(new black_clover_recipe(this),this);
@@ -71,6 +70,7 @@ public final class StarMetal extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new projectile_listener(),this);
         Bukkit.getPluginManager().registerEvents(new status_display_listener(),this);
         Bukkit.getPluginManager().registerEvents(new weapon_damage(),this);
+        getLogger().info("Custom Crafting Plugin Enabled!");
     }
 
     @Override
@@ -78,6 +78,7 @@ public final class StarMetal extends JavaPlugin {
         StatusDisplay.clearAll();
     }
 
+    /* Add missing config values */
     private void syncMissingConfigValues() {
         FileConfiguration liveConfig = getConfig();
         ConfigurationSection defaults = liveConfig.getDefaults();

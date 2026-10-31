@@ -32,7 +32,7 @@ public final class VersionChecker {
             return;
         }
 
-        plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
+        plugin.getServer().getAsyncScheduler().runNow(plugin, _ -> {
             try {
                 String latestVersion = fetchLatestVersion(apiUrl);
                 if (latestVersion == null) {
