@@ -1,7 +1,7 @@
 name: StarMetal
 version: '1.2'
 main: net.jonnegaming.starMetal.StarMetal
-api-version: '1.21'
+api-version: '26.2'
 dependencies:
   server:
     HammerSharedLib:
